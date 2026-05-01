@@ -1,6 +1,5 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-#include <mutex>
 
 //==============================================================================
 PluginProcessor::PluginProcessor()
@@ -109,10 +108,6 @@ bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages) noexcept
 {
     juce::ignoreUnused (midiMessages);
-
-    // Bogus lock to trigger RTSan in a [[clang::nonblocking]] function.
-    static std::mutex           bogus;
-    std::lock_guard<std::mutex> guard (bogus);
 
     juce::ScopedNoDenormals noDenormals;
     auto                    totalNumInputChannels  = getTotalNumInputChannels();
