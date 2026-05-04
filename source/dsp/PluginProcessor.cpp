@@ -14,7 +14,7 @@ PluginProcessor::PluginProcessor()
 {
 }
 
-PluginProcessor::~PluginProcessor() {}
+PluginProcessor::~PluginProcessor() = default;
 
 //==============================================================================
 const juce::String PluginProcessor::getName() const { return JucePlugin_Name; }
@@ -142,7 +142,11 @@ bool PluginProcessor::hasEditor() const
     return true; // (change this to false if you choose to not supply an editor)
 }
 
-juce::AudioProcessorEditor* PluginProcessor::createEditor() { return new PluginEditor (*this); }
+juce::AudioProcessorEditor* PluginProcessor::createEditor()
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+    return new PluginEditor (*this);
+}
 
 //==============================================================================
 void PluginProcessor::getStateInformation (juce::MemoryBlock& destData)
@@ -162,4 +166,7 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 
 //==============================================================================
 // This creates new instances of the plugin..
-juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() { return new PluginProcessor(); }
+juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+{
+    return new PluginProcessor(); //NOLINT
+}

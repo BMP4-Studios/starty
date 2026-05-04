@@ -4,6 +4,7 @@
 
 #include "../util/RealtimeAttributes.h"
 
+// NOLINTNEXTLINE(cppcoreguidelines-special-member-functions)
 class PluginProcessor : public juce::AudioProcessor
 {
 public:
@@ -15,7 +16,8 @@ public:
 
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
 
-    void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) noexcept RTSAN_NONBLOCKING override;
+    void processBlock (juce::AudioBuffer<float>& buffer,
+                       juce::MidiBuffer&         midiMessages) noexcept RTSAN_NONBLOCKING override;
 
     juce::AudioProcessorEditor* createEditor() override;
     bool                        hasEditor() const override;

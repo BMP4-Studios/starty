@@ -1,31 +1,27 @@
 #include "PluginEditor.h"
 
-PluginEditor::PluginEditor (PluginProcessor& p)
-    : AudioProcessorEditor (&p), processorRef (p)
+PluginEditor::PluginEditor (PluginProcessor& p) : AudioProcessorEditor (&p), processorRef (p)
 {
     juce::ignoreUnused (processorRef);
 
     addAndMakeVisible (inspectButton);
 
     // this chunk of code instantiates and opens the melatonin inspector
-    inspectButton.onClick = [&] {
-        if (!inspector)
+    inspectButton.onClick = [&]
+    {
+        if (! inspector)
         {
-            inspector = std::make_unique<melatonin::Inspector> (*this);
+            inspector          = std::make_unique<melatonin::Inspector> (*this);
             inspector->onClose = [this]() { inspector.reset(); };
         }
 
         inspector->setVisible (true);
     };
 
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    setSize (w, h);
 }
 
-PluginEditor::~PluginEditor()
-{
-}
+PluginEditor::~PluginEditor() {}
 
 void PluginEditor::paint (juce::Graphics& g)
 {
@@ -34,15 +30,19 @@ void PluginEditor::paint (juce::Graphics& g)
 
     auto area = getLocalBounds();
     g.setColour (juce::Colours::white);
-    g.setFont (16.0f);
-    auto helloWorld = juce::String ("Hello from ") + PRODUCT_NAME_WITHOUT_VERSION + " v" VERSION + " running in " + CMAKE_BUILD_TYPE;
-    g.drawText (helloWorld, area.removeFromTop (150), juce::Justification::centred, false);
+    g.setFont (fontSize);
+    const auto helloWorld = juce::String() + PRODUCT_NAME_WITHOUT_VERSION + " v" VERSION + " in " + CMAKE_BUILD_TYPE;
+    const auto textHeight { 150 };
+    g.drawText (helloWorld, area.removeFromTop (textHeight), juce::Justification::centred, false);
 }
 
 void PluginEditor::resized()
 {
     // layout the positions of your child components here
-    auto area = getLocalBounds();
-    area.removeFromBottom(50);
-    inspectButton.setBounds (getLocalBounds().withSizeKeepingCentre(100, 50));
+    auto       area = getLocalBounds();
+    const auto buffer { 50 };
+    area.removeFromBottom (buffer);
+    const auto buttonW { 100 };
+    const auto buttonH { 50 };
+    inspectButton.setBounds (getLocalBounds().withSizeKeepingCentre (buttonW, buttonH));
 }
