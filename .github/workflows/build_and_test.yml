@@ -316,9 +316,17 @@ jobs:
       - name: Install JUCE Linux dependencies
         run: >-
           sudo apt-get update &&
-          sudo apt-get install -y ninja-build lld gcovr
+          sudo apt-get install -y ninja-build lld
           libasound2-dev libx11-dev libxinerama-dev libxext-dev
           libfreetype6-dev libwebkit2gtk-4.1-dev libglu1-mesa-dev
+
+      # gcovr 6+ is needed for --gcov-ignore-errors. Ubuntu apt ships 5.0, so
+      # install via pipx (preinstalled on GH runners) for a current version.
+      - name: Install gcovr
+        if: matrix.name == 'Coverage'
+        run: |
+          pipx install gcovr
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Configure
         run: >-
@@ -343,13 +351,19 @@ jobs:
         run: ctest --test-dir Builds --output-on-failure --verbose -E NOT_BUILT
 
       # Coverage-only: gcovr converts Clang's .gcda/.gcno into a Cobertura XML.
-      # Filter to source/ so JUCE / submodules / generated build files don't
-      # dilute the number.
+      # --filter 'source/' restricts the report to our code. JUCE module sources
+      # get instrumented anyway (JUCE's CMake injects them as target_sources of
+      # Tests, so they inherit Tests' compile flags including SharedCode's
+      # INTERFACE --coverage), and gcov can't resolve some JUCE-internal source
+      # paths (e.g. Harfbuzz's .rl files). --gcov-ignore-errors makes those
+      # silent skips rather than fatal — the report itself stays clean because
+      # of the source/ filter.
       - name: Generate coverage report
         if: matrix.name == 'Coverage'
         run: >-
           gcovr --root .
           --gcov-executable "llvm-cov gcov"
+          --gcov-ignore-errors=no_working_dir_found
           --filter 'source/'
           --xml-pretty
           --output coverage.xml
