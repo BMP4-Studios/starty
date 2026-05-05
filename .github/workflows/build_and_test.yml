@@ -270,13 +270,15 @@ jobs:
             c_flags:      "-fsanitize=realtime"
             linker_flags: "-fsanitize=realtime -fuse-ld=lld-20"
 
-          # Coverage uses Clang's gcov-compatible --coverage instrumentation.
-          # Debug + -O0 keeps line mapping accurate. The post-test gcovr +
-          # Codecov steps below are gated on matrix.name == 'Coverage'.
+          # Coverage uses Clang's gcov-compatible --coverage instrumentation,
+          # scoped to SharedCode INTERFACE via -DENABLE_COVERAGE=ON so Catch2
+          # / JUCE / other deps don't get instrumented (gcov can't resolve
+          # their source paths and would fail). Debug build_type ensures
+          # -O0 -g for accurate line mapping. The post-test gcovr + Codecov
+          # steps below are gated on matrix.name == 'Coverage'.
           - name: Coverage
             build_type:   Debug
-            c_flags:      "--coverage -O0 -g"
-            linker_flags: "--coverage"
+            cmake_flags:  "-DENABLE_COVERAGE=ON"
 
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
@@ -327,6 +329,7 @@ jobs:
           -DCMAKE_CXX_FLAGS="${{ matrix.c_flags }}"
           -DCMAKE_EXE_LINKER_FLAGS="${{ matrix.linker_flags }}"
           -DCMAKE_SHARED_LINKER_FLAGS="${{ matrix.linker_flags }}"
+          ${{ matrix.cmake_flags }}
 
       - name: Build
         run: cmake --build Builds --target Tests
