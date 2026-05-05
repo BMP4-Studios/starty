@@ -228,14 +228,14 @@ jobs:
           name: ${{ env.ARTIFACT_NAME }}.pkg
           path: packaging/${{ env.ARTIFACT_NAME }}.pkg
 
-  sanitizers:
+  instrumented_tests:
     # don't double run on PRs (same logic as build_and_test above)
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    # Build *only* the Tests target (via cmake --build --target Tests) with
-    # runtime sanitizers enabled. juce_add_plugin still runs at configure time
-    # (Tests.cmake / Benchmarks.cmake read COMPILE_DEFINITIONS off the plugin
-    # target), but the AU/VST3/Standalone format targets are never built because
-    # they're not a dependency of Tests.
+    # Build *only* the Tests target (via cmake --build --target Tests) under
+    # an instrumentation flavor (sanitizer or coverage). juce_add_plugin still
+    # runs at configure time (Tests.cmake / Benchmarks.cmake read
+    # COMPILE_DEFINITIONS off the plugin target), but the AU/VST3/Standalone
+    # format targets are never built because they're not a dependency of Tests.
     strategy:
       fail-fast: false
       matrix:
@@ -269,6 +269,14 @@ jobs:
             cxx:          clang++-20
             c_flags:      "-fsanitize=realtime"
             linker_flags: "-fsanitize=realtime -fuse-ld=lld-20"
+
+          # Coverage uses Clang's gcov-compatible --coverage instrumentation.
+          # Debug + -O0 keeps line mapping accurate. The post-test gcovr +
+          # Codecov steps below are gated on matrix.name == 'Coverage'.
+          - name: Coverage
+            build_type:   Debug
+            c_flags:      "--coverage -O0 -g"
+            linker_flags: "--coverage"
 
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
@@ -306,7 +314,7 @@ jobs:
       - name: Install JUCE Linux dependencies
         run: >-
           sudo apt-get update &&
-          sudo apt-get install -y ninja-build lld
+          sudo apt-get install -y ninja-build lld gcovr
           libasound2-dev libx11-dev libxinerama-dev libxext-dev
           libfreetype6-dev libwebkit2gtk-4.1-dev libglu1-mesa-dev
 
@@ -314,7 +322,7 @@ jobs:
         run: >-
           cmake -B Builds
           -G Ninja
-          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type || 'Release' }}
           -DCMAKE_C_FLAGS="${{ matrix.c_flags }}"
           -DCMAKE_CXX_FLAGS="${{ matrix.c_flags }}"
           -DCMAKE_EXE_LINKER_FLAGS="${{ matrix.linker_flags }}"
@@ -325,11 +333,32 @@ jobs:
 
       # Benchmarks.cmake's catch_discover_tests(Benchmarks) registers a
       # "<name>_NOT_BUILT-<hash>" placeholder test whenever the Benchmarks
-      # binary is missing. Since we deliberately skip building Benchmarks under
-      # sanitizers (they're too slow to instrument), we filter that placeholder
-      # out of the ctest run rather than build the whole benchmark suite.
+      # binary is missing. We deliberately skip building Benchmarks here
+      # (sanitizers are too slow to instrument; coverage doesn't need them),
+      # so we filter that placeholder out of the ctest run.
       - name: Test
         run: ctest --test-dir Builds --output-on-failure --verbose -E NOT_BUILT
+
+      # Coverage-only: gcovr converts Clang's .gcda/.gcno into a Cobertura XML.
+      # Filter to source/ so JUCE / submodules / generated build files don't
+      # dilute the number.
+      - name: Generate coverage report
+        if: matrix.name == 'Coverage'
+        run: >-
+          gcovr --root .
+          --gcov-executable "llvm-cov gcov"
+          --filter 'source/'
+          --xml-pretty
+          --output coverage.xml
+          --print-summary
+
+      - name: Upload coverage to Codecov
+        if: matrix.name == 'Coverage'
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
 
   clang-tidy:
     name: clang-tidy
@@ -423,4 +452,4 @@ jobs:
           files: |
             */*.exe
             */*.zip
-            */*.dmg
+            */*.pkg

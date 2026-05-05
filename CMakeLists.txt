@@ -38,6 +38,10 @@ set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT Embedded CACHE STRING "" FORCE)
 # For simplicity, the name of the CMake project is also the name of the target
 project(${PROJECT_NAME} VERSION ${CURRENT_VERSION})
 
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # Log build environment info (after project() so compiler info is available)
 include(PamplejuceLog)
 
