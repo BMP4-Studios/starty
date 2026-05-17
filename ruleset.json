@@ -1,0 +1,86 @@
+{
+    "id": 15934795,
+    "name": "protect-main",
+    "target": "branch",
+    "source_type": "Repository",
+    "source": "BMP4-Studios/starty",
+    "enforcement": "active",
+    "conditions": {
+        "ref_name": {
+            "exclude": [],
+            "include": [
+                "refs/heads/main"
+            ]
+        }
+    },
+    "rules": [
+        {
+            "type": "deletion"
+        },
+        {
+            "type": "non_fast_forward"
+        },
+        {
+            "type": "pull_request",
+            "parameters": {
+                "required_approving_review_count": 0,
+                "dismiss_stale_reviews_on_push": false,
+                "required_reviewers": [],
+                "require_code_owner_review": false,
+                "require_last_push_approval": false,
+                "required_review_thread_resolution": false,
+                "allowed_merge_methods": [
+                    "merge",
+                    "squash",
+                    "rebase"
+                ]
+            }
+        },
+        {
+            "type": "required_status_checks",
+            "parameters": {
+                "strict_required_status_checks_policy": true,
+                "do_not_enforce_on_create": false,
+                "required_status_checks": [
+                    {
+                        "context": "Linux"
+                    },
+                    {
+                        "context": "macOS"
+                    },
+                    {
+                        "context": "Windows"
+                    },
+                    {
+                        "context": "AddressSanitizer"
+                    },
+                    {
+                        "context": "UndefinedBehaviorSanitizer"
+                    },
+                    {
+                        "context": "ThreadSanitizer"
+                    },
+                    {
+                        "context": "RealtimeSanitizer"
+                    },
+                    {
+                        "context": "clang-tidy"
+                    }
+                ]
+            }
+        }
+    ],
+    "node_id": "RRS_lACqUmVwb3NpdG9yec5JA72ZzgDzJUs",
+    "created_at": "2026-05-04T14:42:03.238-04:00",
+    "updated_at": "2026-05-04T14:42:03.272-04:00",
+    "bypass_actors": [],
+    "current_user_can_bypass": "never",
+    "_links": {
+        "self": {
+            "href": "https://api.github.com/repos/BMP4-Studios/starty/rulesets/15934795"
+        },
+        "html": {
+            "href": "https://github.com/BMP4-Studios/starty/rules/15934795"
+        }
+    }
+}
