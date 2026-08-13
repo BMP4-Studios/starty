@@ -1,25 +1,17 @@
+gh api --method PUT /repos/BMP4-Studios/gesha/rulesets/{id} --input - << 'EOF'
 {
     "name": "protect-main",
     "target": "branch",
     "enforcement": "active",
     "conditions": {
-        "repository_name": {
-            "include": ["~ALL"],
-            "exclude": [],
-            "protected": false
-        },
         "ref_name": {
             "include": ["~DEFAULT_BRANCH"],
             "exclude": []
         }
     },
     "rules": [
-        {
-            "type": "deletion"
-        },
-        {
-            "type": "non_fast_forward"
-        },
+        { "type": "deletion" },
+        { "type": "non_fast_forward" },
         {
             "type": "pull_request",
             "parameters": {
@@ -29,30 +21,10 @@
                 "require_code_owner_review": false,
                 "require_last_push_approval": false,
                 "required_review_thread_resolution": false,
-                "allowed_merge_methods": [
-                    "merge",
-                    "squash",
-                    "rebase"
-                ]
-            }
-        },
-        {
-            "type": "required_status_checks",
-            "parameters": {
-                "strict_required_status_checks_policy": true,
-                "do_not_enforce_on_create": false,
-                "required_status_checks": [
-                    { "context": "Linux" },
-                    { "context": "macOS" },
-                    { "context": "Windows" },
-                    { "context": "AddressSanitizer" },
-                    { "context": "UndefinedBehaviorSanitizer" },
-                    { "context": "ThreadSanitizer" },
-                    { "context": "RealtimeSanitizer" },
-                    { "context": "clang-tidy" }
-                ]
+                "allowed_merge_methods": ["merge", "squash", "rebase"]
             }
         }
     ],
     "bypass_actors": []
 }
+EOF
