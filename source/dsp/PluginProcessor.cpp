@@ -29,12 +29,12 @@ const juce::String PluginProcessor::getProgramName (int index) // NOLINT
     return {};
 }
 
-void PluginProcessor::changeProgramName (int index, const juce::String& newName)
+void PluginProcessor::changeProgramName (int index, const juce::String& newName) // NOLINT
 {
     juce::ignoreUnused (index, newName);
 }
 
-void PluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void PluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)  // NOLINT
 {
     juce::ignoreUnused (sampleRate, samplesPerBlock);
 }

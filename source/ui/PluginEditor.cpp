@@ -1,7 +1,7 @@
 #include "PluginEditor.h"
 #include "BinaryData.h"
 
-PluginEditor::PluginEditor (PluginProcessor& p) : AudioProcessorEditor (&p), processorRef (p)
+PluginEditor::PluginEditor (PluginProcessor& p) : AudioProcessorEditor (&p), processorRef (p)  // NOLINT
 {
     juce::ignoreUnused (processorRef);
 
@@ -13,7 +13,7 @@ PluginEditor::PluginEditor (PluginProcessor& p) : AudioProcessorEditor (&p), pro
         if (! inspector)
         {
             inspector          = std::make_unique<melatonin::Inspector> (*this);
-            inspector->onClose = [this]() { inspector.reset(); };
+            inspector->onClose = [this] { inspector.reset(); };
         }
 
         inspector->setVisible (true);
