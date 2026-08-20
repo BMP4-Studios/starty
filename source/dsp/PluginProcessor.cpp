@@ -97,7 +97,7 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Midi
     }
 }
 
-void PluginProcessor::getStateInformation (juce::MemoryBlock& destData)
+void PluginProcessor::getStateInformation (juce::MemoryBlock& destData)  // NOLINT
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes

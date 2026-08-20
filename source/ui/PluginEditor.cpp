@@ -1,7 +1,8 @@
 #include "PluginEditor.h"
 #include "BinaryData.h"
 
-PluginEditor::PluginEditor (PluginProcessor& p) : AudioProcessorEditor (&p), processorRef (p)  // NOLINT
+// NOLINTNEXTLINE
+PluginEditor::PluginEditor (PluginProcessor& p) : AudioProcessorEditor (&p), processorRef (p)
 {
     juce::ignoreUnused (processorRef);
 
