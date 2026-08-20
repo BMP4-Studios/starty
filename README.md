@@ -38,6 +38,14 @@ Shortcut: editor-wide case-aware find-and-replace of `Starty` → `Spangle` and 
 brew install cmake ninja clang-format          # Homebrew: https://brew.sh
 ```
 
+## Clang-tidy
+Install LLVM and Clang-Tidy:
+- Open your Terminal and install the full LLVM package using Homebrew: `brew install llvm`
+- Symlink the clang-tidy binary to your system path so you can use it globally: `ln -s "$(brew --prefix llvm)/bin/clang-tidy" /opt/homebrew/bin/clang-tidy`
+- Restart your terminal or reload your shell profile to apply changes. Verify the installation: `clang-tidy --version`
+
+Then to run it on the whole repo: 
+
 ### Linux (Ubuntu / Debian)
 ```bash
 sudo apt update
