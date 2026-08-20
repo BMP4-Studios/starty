@@ -1,7 +1,7 @@
 #include "PluginProcessor.h"
 #include "../ui/PluginEditor.h"
 
-PluginProcessor::PluginProcessor()
+PluginProcessor::PluginProcessor() // NOLINT
 : AudioProcessor (BusesProperties()
 #if ! JucePlugin_IsMidiEffect
 #if ! JucePlugin_IsSynth
@@ -23,7 +23,7 @@ int PluginProcessor::getCurrentProgram() { return 0; }
 
 void PluginProcessor::setCurrentProgram (int index) { juce::ignoreUnused (index); }
 
-const juce::String PluginProcessor::getProgramName (int index)
+const juce::String PluginProcessor::getProgramName (int index) // NOLINT
 {
     juce::ignoreUnused (index);
     return {};
